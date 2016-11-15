@@ -73,13 +73,17 @@ if __name__ == '__main__':
     if not os.path.isfile('jquery.js'):
         urllib.request.urlretrieve('https://code.jquery.com/jquery-3.1.1.min.js', 'jquery.js')
 
-    okular1 = subprocess.Popen(['okular', 'presentation.pdf'])
-    okular2 = subprocess.Popen(['okular', 'notes.pdf'])
-
-    time.sleep(3)
+    okular1 = subprocess.Popen(['okular', 'presentation.pdf'], stdin=subprocess.DEVNULL)
+    time.sleep(1)
+    okular2 = subprocess.Popen(['okular', 'notes.pdf'], stdin=subprocess.DEVNULL)
+    time.sleep(1)
 
     session = dbus.SessionBus()
 
     dbus1 = session.get_object('org.kde.okular-{}'.format(okular1.pid), '/okular')
     dbus2 = session.get_object('org.kde.okular-{}'.format(okular2.pid), '/okular')
+
+    for obj in (dbus1, dbus2):
+        obj.goToPage(dbus.UInt32(1))
+
     app.run(host='0.0.0.0')
